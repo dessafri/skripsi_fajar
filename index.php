@@ -45,7 +45,7 @@ if(isset($_POST["submit_logout"])){
                             <a class="nav-link font-navbar" href="kriteria.php">Data Kriteria</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-navbar" href="#">Hasil</a>
+                            <a class="nav-link font-navbar" href="hasil.php">Hasil</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle font-navbar" href="#" id="navbarDropdown" role="button"

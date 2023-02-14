@@ -1,3 +1,20 @@
+<?php
+session_start();
+require './functions.php';
+$role = $_SESSION["role"];
+if ($_SESSION['id'] != '1') {
+    header('location: login.php');
+    exit();
+}
+
+if(isset($_POST["submit_logout"])){
+  logout($_POST);
+}
+if(isset($_POST["submit_peserta"])){
+  buatPeserta($_POST);
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,6 +26,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap4.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.bootstrap4.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Daftar Peserta</title>
 </head>
 
@@ -34,7 +54,7 @@
                             <a class="nav-link font-navbar" href="kriteria.php">Data Kriteria</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-navbar" href="#">Hasil</a>
+                            <a class="nav-link font-navbar" href="hasil.php">Hasil</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle font-navbar" href="#" id="navbarDropdown" role="button"
@@ -58,7 +78,7 @@
         <div class="container">
             <div style="display: flex; justify-content: space-between">
                 <h1 class="h1-brand">Data Peserta Bantuan</h1>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#modalPeserta">
                     Tambah Peserta
                 </button>
             </div>
@@ -66,521 +86,128 @@
                 <table id="example" class="table table-striped table-bordered" style="width: 100%">
                     <thead class="table-data">
                         <tr>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Office</th>
-                            <th>Age</th>
-                            <th>Start date</th>
-                            <th>Salary</th>
+                            <th>No</th>
+                            <th>NIK</th>
+                            <th>NAMA</th>
+                            <th>Jenis Kelammin</th>
+                            <th>RT / RW</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php
+                        $dataPeserta = query("SELECT * FROM peserta");
+                        $index = 1;
+                        foreach($dataPeserta as $dataPeserta):
+                        ?>
                         <tr>
-                            <td>Tiger Nixon</td>
-                            <td>System Architect</td>
-                            <td>Edinburgh</td>
-                            <td>61</td>
-                            <td>2011-04-25</td>
-                            <td>$320,800</td>
+                            <td><?= $index++ ?></td>
+                            <td><?= $dataPeserta["nik"]?></td>
+                            <td><?= $dataPeserta["nama"]?></td>
+                            <td><?= $dataPeserta["jenis_kelamin"]?></td>
+                            <td><?= $dataPeserta["rt"]?> / <?=$dataPeserta["rw"]?></td>
+                            <td>
+                                <button class="btn btn-primary btn-edit-peserta" data-id=<?=$dataPeserta["nik"]?>><i
+                                        class="fas fa-pencil"></i></button>
+                                <button class="btn btn-danger btn-delete-peserta" data-id=<?=$dataPeserta["nik"]?>><i
+                                        class="fas fa-trash"></i></button>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Garrett Winters</td>
-                            <td>Accountant</td>
-                            <td>Tokyo</td>
-                            <td>63</td>
-                            <td>2011-07-25</td>
-                            <td>$170,750</td>
-                        </tr>
-                        <tr>
-                            <td>Ashton Cox</td>
-                            <td>Junior Technical Author</td>
-                            <td>San Francisco</td>
-                            <td>66</td>
-                            <td>2009-01-12</td>
-                            <td>$86,000</td>
-                        </tr>
-                        <tr>
-                            <td>Cedric Kelly</td>
-                            <td>Senior Javascript Developer</td>
-                            <td>Edinburgh</td>
-                            <td>22</td>
-                            <td>2012-03-29</td>
-                            <td>$433,060</td>
-                        </tr>
-                        <tr>
-                            <td>Airi Satou</td>
-                            <td>Accountant</td>
-                            <td>Tokyo</td>
-                            <td>33</td>
-                            <td>2008-11-28</td>
-                            <td>$162,700</td>
-                        </tr>
-                        <tr>
-                            <td>Brielle Williamson</td>
-                            <td>Integration Specialist</td>
-                            <td>New York</td>
-                            <td>61</td>
-                            <td>2012-12-02</td>
-                            <td>$372,000</td>
-                        </tr>
-                        <tr>
-                            <td>Herrod Chandler</td>
-                            <td>Sales Assistant</td>
-                            <td>San Francisco</td>
-                            <td>59</td>
-                            <td>2012-08-06</td>
-                            <td>$137,500</td>
-                        </tr>
-                        <tr>
-                            <td>Rhona Davidson</td>
-                            <td>Integration Specialist</td>
-                            <td>Tokyo</td>
-                            <td>55</td>
-                            <td>2010-10-14</td>
-                            <td>$327,900</td>
-                        </tr>
-                        <tr>
-                            <td>Colleen Hurst</td>
-                            <td>Javascript Developer</td>
-                            <td>San Francisco</td>
-                            <td>39</td>
-                            <td>2009-09-15</td>
-                            <td>$205,500</td>
-                        </tr>
-                        <tr>
-                            <td>Sonya Frost</td>
-                            <td>Software Engineer</td>
-                            <td>Edinburgh</td>
-                            <td>23</td>
-                            <td>2008-12-13</td>
-                            <td>$103,600</td>
-                        </tr>
-                        <tr>
-                            <td>Jena Gaines</td>
-                            <td>Office Manager</td>
-                            <td>London</td>
-                            <td>30</td>
-                            <td>2008-12-19</td>
-                            <td>$90,560</td>
-                        </tr>
-                        <tr>
-                            <td>Quinn Flynn</td>
-                            <td>Support Lead</td>
-                            <td>Edinburgh</td>
-                            <td>22</td>
-                            <td>2013-03-03</td>
-                            <td>$342,000</td>
-                        </tr>
-                        <tr>
-                            <td>Charde Marshall</td>
-                            <td>Regional Director</td>
-                            <td>San Francisco</td>
-                            <td>36</td>
-                            <td>2008-10-16</td>
-                            <td>$470,600</td>
-                        </tr>
-                        <tr>
-                            <td>Haley Kennedy</td>
-                            <td>Senior Marketing Designer</td>
-                            <td>London</td>
-                            <td>43</td>
-                            <td>2012-12-18</td>
-                            <td>$313,500</td>
-                        </tr>
-                        <tr>
-                            <td>Tatyana Fitzpatrick</td>
-                            <td>Regional Director</td>
-                            <td>London</td>
-                            <td>19</td>
-                            <td>2010-03-17</td>
-                            <td>$385,750</td>
-                        </tr>
-                        <tr>
-                            <td>Michael Silva</td>
-                            <td>Marketing Designer</td>
-                            <td>London</td>
-                            <td>66</td>
-                            <td>2012-11-27</td>
-                            <td>$198,500</td>
-                        </tr>
-                        <tr>
-                            <td>Paul Byrd</td>
-                            <td>Chief Financial Officer (CFO)</td>
-                            <td>New York</td>
-                            <td>64</td>
-                            <td>2010-06-09</td>
-                            <td>$725,000</td>
-                        </tr>
-                        <tr>
-                            <td>Gloria Little</td>
-                            <td>Systems Administrator</td>
-                            <td>New York</td>
-                            <td>59</td>
-                            <td>2009-04-10</td>
-                            <td>$237,500</td>
-                        </tr>
-                        <tr>
-                            <td>Bradley Greer</td>
-                            <td>Software Engineer</td>
-                            <td>London</td>
-                            <td>41</td>
-                            <td>2012-10-13</td>
-                            <td>$132,000</td>
-                        </tr>
-                        <tr>
-                            <td>Dai Rios</td>
-                            <td>Personnel Lead</td>
-                            <td>Edinburgh</td>
-                            <td>35</td>
-                            <td>2012-09-26</td>
-                            <td>$217,500</td>
-                        </tr>
-                        <tr>
-                            <td>Jenette Caldwell</td>
-                            <td>Development Lead</td>
-                            <td>New York</td>
-                            <td>30</td>
-                            <td>2011-09-03</td>
-                            <td>$345,000</td>
-                        </tr>
-                        <tr>
-                            <td>Yuri Berry</td>
-                            <td>Chief Marketing Officer (CMO)</td>
-                            <td>New York</td>
-                            <td>40</td>
-                            <td>2009-06-25</td>
-                            <td>$675,000</td>
-                        </tr>
-                        <tr>
-                            <td>Caesar Vance</td>
-                            <td>Pre-Sales Support</td>
-                            <td>New York</td>
-                            <td>21</td>
-                            <td>2011-12-12</td>
-                            <td>$106,450</td>
-                        </tr>
-                        <tr>
-                            <td>Doris Wilder</td>
-                            <td>Sales Assistant</td>
-                            <td>Sydney</td>
-                            <td>23</td>
-                            <td>2010-09-20</td>
-                            <td>$85,600</td>
-                        </tr>
-                        <tr>
-                            <td>Angelica Ramos</td>
-                            <td>Chief Executive Officer (CEO)</td>
-                            <td>London</td>
-                            <td>47</td>
-                            <td>2009-10-09</td>
-                            <td>$1,200,000</td>
-                        </tr>
-                        <tr>
-                            <td>Gavin Joyce</td>
-                            <td>Developer</td>
-                            <td>Edinburgh</td>
-                            <td>42</td>
-                            <td>2010-12-22</td>
-                            <td>$92,575</td>
-                        </tr>
-                        <tr>
-                            <td>Jennifer Chang</td>
-                            <td>Regional Director</td>
-                            <td>Singapore</td>
-                            <td>28</td>
-                            <td>2010-11-14</td>
-                            <td>$357,650</td>
-                        </tr>
-                        <tr>
-                            <td>Brenden Wagner</td>
-                            <td>Software Engineer</td>
-                            <td>San Francisco</td>
-                            <td>28</td>
-                            <td>2011-06-07</td>
-                            <td>$206,850</td>
-                        </tr>
-                        <tr>
-                            <td>Fiona Green</td>
-                            <td>Chief Operating Officer (COO)</td>
-                            <td>San Francisco</td>
-                            <td>48</td>
-                            <td>2010-03-11</td>
-                            <td>$850,000</td>
-                        </tr>
-                        <tr>
-                            <td>Shou Itou</td>
-                            <td>Regional Marketing</td>
-                            <td>Tokyo</td>
-                            <td>20</td>
-                            <td>2011-08-14</td>
-                            <td>$163,000</td>
-                        </tr>
-                        <tr>
-                            <td>Michelle House</td>
-                            <td>Integration Specialist</td>
-                            <td>Sydney</td>
-                            <td>37</td>
-                            <td>2011-06-02</td>
-                            <td>$95,400</td>
-                        </tr>
-                        <tr>
-                            <td>Suki Burks</td>
-                            <td>Developer</td>
-                            <td>London</td>
-                            <td>53</td>
-                            <td>2009-10-22</td>
-                            <td>$114,500</td>
-                        </tr>
-                        <tr>
-                            <td>Prescott Bartlett</td>
-                            <td>Technical Author</td>
-                            <td>London</td>
-                            <td>27</td>
-                            <td>2011-05-07</td>
-                            <td>$145,000</td>
-                        </tr>
-                        <tr>
-                            <td>Gavin Cortez</td>
-                            <td>Team Leader</td>
-                            <td>San Francisco</td>
-                            <td>22</td>
-                            <td>2008-10-26</td>
-                            <td>$235,500</td>
-                        </tr>
-                        <tr>
-                            <td>Martena Mccray</td>
-                            <td>Post-Sales support</td>
-                            <td>Edinburgh</td>
-                            <td>46</td>
-                            <td>2011-03-09</td>
-                            <td>$324,050</td>
-                        </tr>
-                        <tr>
-                            <td>Unity Butler</td>
-                            <td>Marketing Designer</td>
-                            <td>San Francisco</td>
-                            <td>47</td>
-                            <td>2009-12-09</td>
-                            <td>$85,675</td>
-                        </tr>
-                        <tr>
-                            <td>Howard Hatfield</td>
-                            <td>Office Manager</td>
-                            <td>San Francisco</td>
-                            <td>51</td>
-                            <td>2008-12-16</td>
-                            <td>$164,500</td>
-                        </tr>
-                        <tr>
-                            <td>Hope Fuentes</td>
-                            <td>Secretary</td>
-                            <td>San Francisco</td>
-                            <td>41</td>
-                            <td>2010-02-12</td>
-                            <td>$109,850</td>
-                        </tr>
-                        <tr>
-                            <td>Vivian Harrell</td>
-                            <td>Financial Controller</td>
-                            <td>San Francisco</td>
-                            <td>62</td>
-                            <td>2009-02-14</td>
-                            <td>$452,500</td>
-                        </tr>
-                        <tr>
-                            <td>Timothy Mooney</td>
-                            <td>Office Manager</td>
-                            <td>London</td>
-                            <td>37</td>
-                            <td>2008-12-11</td>
-                            <td>$136,200</td>
-                        </tr>
-                        <tr>
-                            <td>Jackson Bradshaw</td>
-                            <td>Director</td>
-                            <td>New York</td>
-                            <td>65</td>
-                            <td>2008-09-26</td>
-                            <td>$645,750</td>
-                        </tr>
-                        <tr>
-                            <td>Olivia Liang</td>
-                            <td>Support Engineer</td>
-                            <td>Singapore</td>
-                            <td>64</td>
-                            <td>2011-02-03</td>
-                            <td>$234,500</td>
-                        </tr>
-                        <tr>
-                            <td>Bruno Nash</td>
-                            <td>Software Engineer</td>
-                            <td>London</td>
-                            <td>38</td>
-                            <td>2011-05-03</td>
-                            <td>$163,500</td>
-                        </tr>
-                        <tr>
-                            <td>Sakura Yamamoto</td>
-                            <td>Support Engineer</td>
-                            <td>Tokyo</td>
-                            <td>37</td>
-                            <td>2009-08-19</td>
-                            <td>$139,575</td>
-                        </tr>
-                        <tr>
-                            <td>Thor Walton</td>
-                            <td>Developer</td>
-                            <td>New York</td>
-                            <td>61</td>
-                            <td>2013-08-11</td>
-                            <td>$98,540</td>
-                        </tr>
-                        <tr>
-                            <td>Finn Camacho</td>
-                            <td>Support Engineer</td>
-                            <td>San Francisco</td>
-                            <td>47</td>
-                            <td>2009-07-07</td>
-                            <td>$87,500</td>
-                        </tr>
-                        <tr>
-                            <td>Serge Baldwin</td>
-                            <td>Data Coordinator</td>
-                            <td>Singapore</td>
-                            <td>64</td>
-                            <td>2012-04-09</td>
-                            <td>$138,575</td>
-                        </tr>
-                        <tr>
-                            <td>Zenaida Frank</td>
-                            <td>Software Engineer</td>
-                            <td>New York</td>
-                            <td>63</td>
-                            <td>2010-01-04</td>
-                            <td>$125,250</td>
-                        </tr>
-                        <tr>
-                            <td>Zorita Serrano</td>
-                            <td>Software Engineer</td>
-                            <td>San Francisco</td>
-                            <td>56</td>
-                            <td>2012-06-01</td>
-                            <td>$115,000</td>
-                        </tr>
-                        <tr>
-                            <td>Jennifer Acosta</td>
-                            <td>Junior Javascript Developer</td>
-                            <td>Edinburgh</td>
-                            <td>43</td>
-                            <td>2013-02-01</td>
-                            <td>$75,650</td>
-                        </tr>
-                        <tr>
-                            <td>Cara Stevens</td>
-                            <td>Sales Assistant</td>
-                            <td>New York</td>
-                            <td>46</td>
-                            <td>2011-12-06</td>
-                            <td>$145,600</td>
-                        </tr>
-                        <tr>
-                            <td>Hermione Butler</td>
-                            <td>Regional Director</td>
-                            <td>London</td>
-                            <td>47</td>
-                            <td>2011-03-21</td>
-                            <td>$356,250</td>
-                        </tr>
-                        <tr>
-                            <td>Lael Greer</td>
-                            <td>Systems Administrator</td>
-                            <td>London</td>
-                            <td>21</td>
-                            <td>2009-02-27</td>
-                            <td>$103,500</td>
-                        </tr>
-                        <tr>
-                            <td>Jonas Alexander</td>
-                            <td>Developer</td>
-                            <td>San Francisco</td>
-                            <td>30</td>
-                            <td>2010-07-14</td>
-                            <td>$86,500</td>
-                        </tr>
-                        <tr>
-                            <td>Shad Decker</td>
-                            <td>Regional Director</td>
-                            <td>Edinburgh</td>
-                            <td>51</td>
-                            <td>2008-11-13</td>
-                            <td>$183,000</td>
-                        </tr>
-                        <tr>
-                            <td>Michael Bruce</td>
-                            <td>Javascript Developer</td>
-                            <td>Singapore</td>
-                            <td>29</td>
-                            <td>2011-06-27</td>
-                            <td>$183,000</td>
-                        </tr>
-                        <tr>
-                            <td>Donna Snider</td>
-                            <td>Customer Support</td>
-                            <td>New York</td>
-                            <td>27</td>
-                            <td>2011-01-25</td>
-                            <td>$112,000</td>
-                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Office</th>
-                            <th>Age</th>
-                            <th>Start date</th>
-                            <th>Salary</th>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>
     </section>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="modalPeserta" tabindex="-1" aria-labelledby="modalPesertaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Tambah Peserta</h5>
+                    <h5 class="modal-title" id="modalPesertaLabel">Tambah Peserta</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label for="nama">Nama</label>
-                            <input type="text" class="form-control" id="nama" aria-describedby="emailHelp" />
+                    <form action="" method="POST">
+                        <div class="biodata" id="biodata">
+                            <div class="form-group">
+                                <label for="nik">Nik</label>
+                                <input type="text" class="form-control" name="nik" id="nik"
+                                    aria-describedby="emailHelp" />
+                            </div>
+                            <div class="form-group">
+                                <label for="nama">Nama</label>
+                                <input type="text" name="nama" class="form-control" id="nama" />
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlSelect1">Jenis Kelamin</label>
+                                <select class="form-control" id="exampleFormControlSelect1" name="jenis_kelamin">
+                                    <option value="0">-- Silahkan Pilih Jenis Kelamin --</option>
+                                    <option value="LAKI-LAKI">LAKI-LAKI</option>
+                                    <option value="PEREMPUAN">PEREMPUAN</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="date">Date</label>
+                                <input class="form-control" id="date" name="date" placeholder="MM/DD/YYY" type="date" />
+                            </div>
+                            <div class="form-group">
+                                <label for="alamat">Alamat</label>
+                                <input type="text" class="form-control" name="alamat" id="alamat" />
+                            </div>
+                            <div class="form-group">
+                                <label for="rt">Rt</label>
+                                <input type="text" class="form-control" name="rt" id="rt" />
+                            </div>
+                            <div class="form-group">
+                                <label for="rw">Rw</label>
+                                <input type="text" class="form-control" name="rw" id="rw" />
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="RT">RT</label>
-                            <input type="text" class="form-control" id="RT" />
+                        <div class="pertanyaan d-none" id="pertanyaan">
+                            <?php
+                            $dataKriteria = query("SELECT * FROM kriteria");
+                            foreach($dataKriteria as $dataKriteria) :
+                            ?>
+                            <div class="form-group">
+                                <label for="exampleFormControlSelect1"><?= $dataKriteria["nama_kriteria"] ?></label>
+                                <input type="hidden" name="keterangan[]" value="<?= $dataKriteria["id_kriteria"] ?>">
+                                <select class="form-control" id="exampleFormControlSelect1"
+                                    name="<?= $dataKriteria["id_kriteria"] ?>">
+                                    <option value="0">- Silahkan Pilih Sesuai Kriteria -</option>
+                                    <?php
+                                    $idKriteria = $dataKriteria["id_kriteria"]; 
+                                    $dataDetailKriteria = query("SELECT * FROM detail_kriteria WHERE id_kriteria = '$idKriteria'");
+                                    foreach($dataDetailKriteria as $dataDetailKriteria):
+                                    ?>
+                                    <option value="<?=$dataDetailKriteria["nilai"] ?>">
+                                        <?= $dataDetailKriteria["keterangan"]?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
-                        <div class="form-group">
-                            <label for="RW">RW</label>
-                            <input type="text" class="form-control" id="RW" />
-                        </div>
-                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        Close
-                    </button>
-                    <button type="button" class="btn btn-primary">Simpan</button>
+                <div class="row">
+                    <div class="col col-12">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" class="btn btn-primary d-none" id="sebelumnya">Sebelumnya</button>
+                            <button type="button" class="btn btn-primary" id="selanjutnya">Selanjutnya</button>
+                            <button type="submit" class="btn btn-primary d-none" name="submit_peserta"
+                                id="simpan">Simpan</button>
+                        </div>
+                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+    <div id="editModalPeserta"></div>
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
@@ -593,6 +220,9 @@
     <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
+        integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
     $(document).ready(function() {
         var table = $("#example").DataTable({
@@ -626,6 +256,118 @@
             .buttons()
             .container()
             .appendTo("#example_wrapper .col-md-6:eq(0)");
+
+        $("#selanjutnya").on("click", function() {
+            $("#sebelumnya").removeClass("d-none");
+            $("#selanjutnya").addClass("d-none");
+            $("#biodata").addClass("d-none");
+            $("#pertanyaan").removeClass("d-none");
+            $("#simpan").removeClass("d-none");
+        })
+        $("#sebelumnya").on("click", function() {
+            $("#sebelumnya").addClass("d-none");
+            $("#selanjutnya").removeClass("d-none");
+            $("#biodata").removeClass("d-none");
+            $("#pertanyaan").addClass("d-none");
+            $("#simpan").addClass("d-none");
+        })
+        $(".btn-edit-peserta").on("click", function() {
+            let nik = $(this).attr("data-id");
+            let formData = new FormData();
+            formData.append('id', nik);
+            fetch('dataPeserta.php', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                return response.json()
+            }).then(responseJson => {
+                let data = responseJson;
+
+                let modal = `
+                <div class="modal fade" id="modalEditPeserta" tabindex="-1" aria-labelledby="modalEditPesertaLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalEditPesertaLabel">Edit Peserta</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="POST">
+                                    <div class="biodata" id="biodataEdit">
+                                        <div class="form-group">
+                                            <label for="nik">Nik</label>
+                                            <input type="text" value="${data[0].nik}" class="form-control" name="nik" id="nik"
+                                                aria-describedby="emailHelp" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="nama">Nama</label>
+                                            <input type="text" name="nama" value='${data[0].nama}' class="form-control" id="nama" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleFormControlSelect1">Jenis Kelamin</label>
+                                            <select class="form-control" id="exampleFormControlSelect1" name="jenis_kelamin">
+                                                <option value="${data[0].jenis_kelamin}" selected>${data[0].jenis_kelamin}</option>
+                                                <option value="LAKI-LAKI">LAKI-LAKI</option>
+                                                <option value="PEREMPUAN">PEREMPUAN</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label" for="date">Date</label>
+                                            <input class="form-control" value='${data[0].tanggal_lahir}' id="date" name="date" placeholder="MM/DD/YYY" type="date" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="alamat">Alamat</label>
+                                            <input type="text" value='${data[0].alamat}' class="form-control" name="alamat" id="alamat" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="rt">Rt</label>
+                                            <input type="text" value="${data[0].rt}" class="form-control" name="rt" id="rt" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="rw">Rw</label>
+                                            <input type="text" value="${data[0].rw}" class="form-control" name="rw" id="rw" />
+                                        </div>
+                                    </div>
+                                    <div class="pertanyaan d-none" id="pertanyaanEdit">
+                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-12">
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button type="button" class="btn btn-primary d-none" id="sebelumnyaEdit">Sebelumnya</button>
+                                        <button type="button" class="btn btn-primary" id="selanjutnyaEdit">Selanjutnya</button>
+                                        <button type="submit" class="btn btn-primary d-none" name="submit_peserta"
+                                            id="simpanEdit">Simpan</button>
+                                    </div>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>`
+                $("#editModalPeserta").html(modal);
+                $("#modalEditPeserta").modal("show");
+                $("#selanjutnyaEdit").on("click", function() {
+                    $("#sebelumnyaEdit").removeClass("d-none");
+                    $("#selanjutnyaEdit").addClass("d-none");
+                    $("#biodataEdit").addClass("d-none");
+                    $("#pertanyaanEdit").removeClass("d-none");
+                    $("#simpanEdit").removeClass("d-none");
+                })
+                $("#sebelumnyaEdit").on("click", function() {
+                    $("#sebelumnyaEdit").addClass("d-none");
+                    $("#selanjutnyaEdit").removeClass("d-none");
+                    $("#biodataEdit").removeClass("d-none");
+                    $("#pertanyaanEdit").addClass("d-none");
+                    $("#simpanEdit").addClass("d-none");
+                })
+            })
+        })
     });
     </script>
 </body>

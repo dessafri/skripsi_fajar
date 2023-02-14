@@ -31,6 +31,12 @@ if(isset($_POST["submit_edit_kriteria"])){
         integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.bootstrap4.min.css" />
+    <style>
+    .swal2-popup {
+        font-size: 12px !important;
+        font-family: Georgia, serif;
+    }
+    </style>
     <title>Daftar Kriteria</title>
 </head>
 
@@ -56,7 +62,7 @@ if(isset($_POST["submit_edit_kriteria"])){
                             <a class="nav-link font-navbar" href="kriteria.php">Data Kriteria</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-navbar" href="#">Hasil</a>
+                            <a class="nav-link font-navbar" href="hasil.php">Hasil</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle font-navbar" href="#" id="navbarDropdown" role="button"
@@ -198,12 +204,14 @@ if(isset($_POST["submit_edit_kriteria"])){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
         integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <script>
     $(document).ready(function() {
         $("#tambahKeterangan").on("click", function() {
             $(".keteranganKriteria").append(`
-                             <div class="col col-8 keteranganData" style="margin-bottom: 10px;">
+                             <div class="col col-7 keteranganData" style="margin-bottom: 10px;">
                                 <input type="text" class="form-control" name="keterangan[]" placeholder="Keterangan">
                             </div>
                             <div class="col col-4 keteranganData" style="margin-bottom: 10px;">
@@ -257,7 +265,6 @@ if(isset($_POST["submit_edit_kriteria"])){
                 return response.json()
             }).then(responseJson => {
                 let data = responseJson;
-                console.log(data);
                 let modal = `
                 <div class="modal fade" id="modalEditKriteria" tabindex="-1" aria-labelledby="modalKriteriaLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -341,7 +348,48 @@ if(isset($_POST["submit_edit_kriteria"])){
         })
         $('.btn-delete').on("click", function() {
             let id = $(this).attr('data-id');
-            console.log(id);
+            Swal.fire({
+                icon: "warning",
+                position: "top",
+                title: "Apakah anda yakin ?",
+                text: "Data Kriteria Akan Terhapus",
+                showConfirmButton: true,
+                showCancelButton: true,
+                reverseButtons: true
+            }).then((result => {
+                if (result.isConfirmed) {
+                    let formData = new FormData;
+                    formData.append('id', id);
+                    fetch("hapusKriteria.php", {
+                        method: "POST",
+                        body: formData
+                    }).then(response => {
+                        return response.json()
+                    }).then(responseJson => {
+                        Swal.fire({
+                            title: 'Terhapus!',
+                            text: 'Kriteria Berhasil Dihapus',
+                            icon: 'success',
+                            position: "top",
+                            showConfirmButton: false
+                        })
+                        setTimeout(() => {
+                            window.location.reload(true);
+                        }, 1000);
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Kriteria Gagal Dihapus',
+                        icon: 'error',
+                        position: "top",
+                        showConfirmButton: false
+                    })
+                    setTimeout(() => {
+                        window.location.reload(true);
+                    }, 1000);
+                }
+            }))
         })
     });
     </script>
