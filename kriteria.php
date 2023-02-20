@@ -70,8 +70,8 @@ if(isset($_POST["submit_edit_kriteria"])){
                                 Data Perhitungan
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">Enthropy</a>
-                                <a class="dropdown-item" href="#">Mabac</a>
+                                <a class="dropdown-item" href="entropy.php">Enthropy</a>
+                                <a class="dropdown-item" href="mabac.php">Mabac</a>
                             </div>
                         </li>
                     </ul>
@@ -148,7 +148,7 @@ if(isset($_POST["submit_edit_kriteria"])){
                             <div class="col col-11">
                                 <div class="form-group">
                                     <label for="nama">Nama Kriteria</label>
-                                    <input type="text" class="form-control" name="nama" id="nama"
+                                    <input type="text" required class="form-control" name="nama" id="nama"
                                         aria-describedby="emailHelp" />
                                 </div>
                             </div>
@@ -156,10 +156,11 @@ if(isset($_POST["submit_edit_kriteria"])){
                         <span>Detail Kriteria</span>
                         <div class="form-row keteranganKriteria">
                             <div class="col col-7 keteranganData" style="margin-bottom: 10px;">
-                                <input type="text" class="form-control" name="keterangan[]" placeholder="Keterangan">
+                                <input type="text" required class="form-control" name="keterangan[]"
+                                    placeholder="Keterangan">
                             </div>
                             <div class="col col-4 keteranganData" style="margin-bottom: 10px;">
-                                <input type="text" class="form-control" name="nilai[]" placeholder="Nilai">
+                                <input type="text" required class="form-control" name="nilai[]" placeholder="Nilai">
                             </div>
                         </div>
                         <span class="keterangan" id="tambahKeterangan" style="color:blue; cursor:pointer;"><i
@@ -212,10 +213,10 @@ if(isset($_POST["submit_edit_kriteria"])){
         $("#tambahKeterangan").on("click", function() {
             $(".keteranganKriteria").append(`
                              <div class="col col-7 keteranganData" style="margin-bottom: 10px;">
-                                <input type="text" class="form-control" name="keterangan[]" placeholder="Keterangan">
+                                <input type="text" required class="form-control" name="keterangan[]" placeholder="Keterangan">
                             </div>
                             <div class="col col-4 keteranganData" style="margin-bottom: 10px;">
-                                <input type="text" class="form-control" name="nilai[]" placeholder="Nilai">
+                                <input type="text" required class="form-control" name="nilai[]" placeholder="Nilai">
                             </div>
             `);
         })

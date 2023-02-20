@@ -53,8 +53,8 @@ if(isset($_POST["submit_logout"])){
                                 Data Perhitungan
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">Enthropy</a>
-                                <a class="dropdown-item" href="#">Mabac</a>
+                                <a class="dropdown-item" href="entropy.php">Enthropy</a>
+                                <a class="dropdown-item" href="mabac.php">Mabac</a>
                             </div>
                         </li>
                     </ul>

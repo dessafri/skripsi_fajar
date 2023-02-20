@@ -91,11 +91,11 @@ if(isset($_POST["submit_edit_kriteria"])){
     <section class="content">
         <div class="container">
             <div style="display: flex; justify-content: space-between">
-                <h1 class="h1-brand" style="font-size:22px;">PERHITUNGAN ENTROPY</h1>
+                <h1 class="h1-brand" style="font-size:22px;">PERHITUNGAN MABAC</h1>
             </div>
 
-            <div class="normalisasi-data">
-                <h2>Normalisasi Data</h2>
+            <div class="normalisasi-data-mabac">
+                <h2>Normalisasi Matrix Mabac</h2>
                 <table id="example" class="table table-striped table-bordered" style="width: 100%">
                     <thead class="table-data">
                         <tr>
@@ -120,18 +120,18 @@ if(isset($_POST["submit_edit_kriteria"])){
                             <td><?= $index++?></td>
                             <td><?= $dataPeserta["nama"]?></td>
                             <?php
-                            $dataKriteriaPeserta = query("SELECT * FROM normaliasi_entropy WHERE nik = $nikPeserta ");
+                            $dataKriteriaPeserta = query("SELECT * FROM normalisasi_mabac WHERE nik = $nikPeserta ");
                             foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
                             ?>
-                            <td><?= $dataKriteriaPeserta["nilai_normaliasi_entropy"] ?></td>
+                            <td><?= $dataKriteriaPeserta["nilai_normalisasi_mabac"] ?></td>
                             <?php endforeach; ?>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-            <div class="entropy-atribut">
-                <h2>Entopy Tiap Atribut</h2>
+            <div class="matrixtertimbangmabac">
+                <h2>Perhitungan Elemen Matrix Tertimbang Mabac</h2>
                 <table id="tabel2" class="table table-striped table-bordered" style="width: 100%">
                     <thead class="table-data">
                         <tr>
@@ -156,18 +156,18 @@ if(isset($_POST["submit_edit_kriteria"])){
                             <td><?= $index++?></td>
                             <td><?= $dataPeserta["nama"]?></td>
                             <?php
-                            $dataKriteriaPeserta = query("SELECT * FROM entropy_tiap_atribut WHERE nik = $nikPeserta ");
+                            $dataKriteriaPeserta = query("SELECT * FROM matrix_tertimbang WHERE nik = $nikPeserta ");
                             foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
                             ?>
-                            <td><?= $dataKriteriaPeserta["nilai_entropy_tiap_atribut"] ?></td>
+                            <td><?= $dataKriteriaPeserta["nilai_matrix_tertimbang"] ?></td>
                             <?php endforeach; ?>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-            <div class="menghitung-bobot-entropy" style="margin-bottom:100px">
-                <h2>Bobot Entropy</h2>
+            <div class="matrixperbatasan-mabac">
+                <h2>Perhitungan Matriks Area Perbatasan</h2>
                 <table id="tabel3" class="table table-striped table-bordered" style="width: 100%">
                     <thead class="table-data">
                         <tr>
@@ -188,12 +188,48 @@ if(isset($_POST["submit_edit_kriteria"])){
                         <tr>
                             <td><?= $index++?></td>
                             <?php
-                            $dataKriteriaPeserta = query("SELECT * FROM bobot_entropy");
+                            $dataKriteriaPeserta = query("SELECT * FROM matrix_perbatasan");
                             foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
                             ?>
-                            <td><?= $dataKriteriaPeserta["nilai_bobot"] ?></td>
+                            <td><?= $dataKriteriaPeserta["nilai_matrix_perbatasan"] ?></td>
                             <?php endforeach; ?>
                         </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="alternatifPerbatasanMabac" style="margin-bottom: 100px;">
+                <h2>Perhitungan Elemen matriks jarak alternatif dari daerah perkiraan perbatasan</h2>
+                <table id="tabel4" class="table table-striped table-bordered" style="width: 100%">
+                    <thead class="table-data">
+                        <tr>
+                            <th>No</th>
+                            <th>PESERTA</th>
+                            <?php
+                            $dataKriteria = query("SELECT * FROM kriteria");
+                            $no = 1;
+                            foreach($dataKriteria as $dataKriteria):?>
+                            <th><?=$dataKriteria["nama_kriteria"]?></th>
+                            <?php endforeach; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $dataPeserta = query("SELECT * FROM peserta");
+                        $index = 1;
+                        foreach($dataPeserta as $dataPeserta):
+                            $nikPeserta = $dataPeserta["nik"];
+                        ?>
+                        <tr>
+                            <td><?= $index++?></td>
+                            <td><?= $dataPeserta["nama"]?></td>
+                            <?php
+                            $dataKriteriaPeserta = query("SELECT * FROM perkiraan_perbatasan WHERE nik = $nikPeserta ");
+                            foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
+                            ?>
+                            <td><?= $dataKriteriaPeserta["nilai_perkalian_perbatasan"] ?></td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -310,6 +346,36 @@ if(isset($_POST["submit_edit_kriteria"])){
             .buttons()
             .container()
             .appendTo("#tabel3_wrapper .col-md-6:eq(0)");
+        var table = $("#tabel4").DataTable({
+            lengthChange: true,
+            buttons: [{
+                    extend: "excel",
+                    text: "Export Excel",
+                    className: "btn-success",
+                },
+                {
+                    extend: "spacer",
+                    style: "bar",
+                },
+                {
+                    extend: "pdf",
+                    text: "Export PDF",
+                    className: "btn-danger"
+                },
+                {
+                    extend: "spacer",
+                    style: "bar",
+                },
+                {
+                    extend: "colvis",
+                    text: "SORTIR"
+                },
+            ],
+        });
+        table
+            .buttons()
+            .container()
+            .appendTo("#tabel4_wrapper .col-md-6:eq(0)");
     });
     </script>
 </body>

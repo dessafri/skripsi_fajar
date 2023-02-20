@@ -110,6 +110,19 @@ function deleteKriteria($data){
     mysqli_query($conn, "DELETE FROM kriteria WHERE id_kriteria='$id'");
     mysqli_query($conn, "DELETE FROM detail_kriteria WHERE id_kriteria='$id'");
 }
+function deletePEserta($data){
+    global $conn;
+
+    $id = $data['id'];
+    mysqli_query($conn, "DELETE FROM peserta WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM perkiraan_perbatasan WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM perangkingan_alternatif WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM normalisasi_mabac WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM normaliasi_entropy WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM matrix_tertimbang WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM entropy_tiap_atribut WHERE nik='$id'");
+    mysqli_query($conn, "DELETE FROM jawaban WHERE nik='$id'");
+}
 function buatPeserta($data){
     global $conn;
     $nik = $data["nik"];
@@ -228,8 +241,137 @@ function buatHasil(){
                         $bobot .
                         "'),";
     }
-    $sqlBobot = rtrim($sqlBobot, ', ');
-    mysqli_query($conn, $sqlBobot);
+    // $sqlBobot = rtrim($sqlBobot, ', ');
+    // mysqli_query($conn, $sqlBobot);
+
+    // normalisasi mabac
+    $dataPeserta = query("SELECT * FROM peserta");
+    $sqlNormalisasiMabac = 'INSERT INTO normalisasi_mabac (id_normalisasi_mabac,nik,id_kriteria, nilai_normalisasi_mabac) VALUES';
+    foreach($dataPeserta as $dataPeserta){
+        $nikPeserta = $dataPeserta["nik"];
+        $dataPerKriteria = query("SELECT jawaban.id_kriteria, jawaban.jawaban_peserta, jawaban.nik FROM jawaban WHERE nik = $nikPeserta");
+        $jumlahPeserta = query("SELECT COUNT(DISTINCT NIK) AS TOTAL FROM peserta");
+        foreach($dataPerKriteria as $dataPerKriteria){
+            $idKriteria = $dataPerKriteria["id_kriteria"];
+            $dataJawaban = $dataPerKriteria["jawaban_peserta"];
+            $totalPeserta = $jumlahPeserta[0]["TOTAL"];
+            $jawabanTerkecil = query("SELECT MIN(jawaban_peserta) as MIN FROM jawaban WHERE jawaban.id_kriteria = $idKriteria");
+            $minjawaban = $jawabanTerkecil["0"]["MIN"];
+            $normalisasiMabac = ($dataJawaban-$minjawaban) / ($totalPeserta - $minjawaban);
+            $sqlNormalisasiMabac .=
+                        "(NULL,'" .
+                        $nikPeserta .
+                        "','" .
+                        $idKriteria .
+                        "','" .
+                        $normalisasiMabac .
+                        "'),";
+        }
+    }
+    // $sqlNormalisasiMabac = rtrim($sqlNormalisasiMabac, ', ');
+    // mysqli_query($conn, $sqlNormalisasiMabac);
+
+    // Matrix tertimbang
+    $dataPeserta = query("SELECT * FROM peserta");
+    $sqlMatrixtertimbang = 'INSERT INTO matrix_tertimbang (id_matrix_tertimbang,nik,id_kriteria, nilai_matrix_tertimbang) VALUES';
+    foreach($dataPeserta as $dataPeserta){
+        $nikPeserta = $dataPeserta["nik"];
+        $dataNormalisasiMabac = query("SELECT normalisasi_mabac.id_kriteria, normalisasi_mabac.nilai_normalisasi_mabac, normalisasi_mabac.nik FROM normalisasi_mabac WHERE normalisasi_mabac.nik = $nikPeserta");
+        foreach($dataNormalisasiMabac as $dataNormalisai){
+            $idKriteria = $dataNormalisai["id_kriteria"];
+            $nilaiNormalisasi = $dataNormalisai["nilai_normalisasi_mabac"];
+            $dataBobot = query("SELECT * FROM bobot_entropy WHERE id_kriteria = $idKriteria");
+            $bobot = $dataBobot[0]["nilai_bobot"];
+            $matrixTertimbang = ($nilaiNormalisasi * $bobot) + $bobot;
+             $sqlMatrixtertimbang .=
+                        "(NULL,'" .
+                        $nikPeserta .
+                        "','" .
+                        $idKriteria .
+                        "','" .
+                        $matrixTertimbang .
+                        "'),";
+        }
+    }
+    // $sqlMatrixtertimbang = rtrim($sqlMatrixtertimbang, ', ');
+    // mysqli_query($conn, $sqlMatrixtertimbang);
+
+    // matrix area perbatasan
+    $totalKriteria = query("SELECT COUNT(DISTINCT id_kriteria) AS TOTAL FROM matrix_tertimbang");
+    $M = 1 / $totalKriteria[0]["TOTAL"];
+    $dataKriteria = query("SELECT DISTINCT matrix_tertimbang.id_kriteria FROM matrix_tertimbang");
+    $sqlMatrixPerbatasan = 'INSERT INTO matrix_perbatasan (id_matrix_perbatasan,id_kriteria,nilai_matrix_perbatasan) VALUES';
+    foreach($dataKriteria as $dataKriteria){
+        $idKriteria = $dataKriteria["id_kriteria"];
+        $dataMatrixTertimbang = query("SELECT nilai_matrix_tertimbang FROM matrix_tertimbang WHERE id_kriteria = $idKriteria");
+        $total = 0;
+        $bobot = 0;
+        foreach($dataMatrixTertimbang as $dataMatrix){
+         $perkalian = $dataMatrix["nilai_matrix_tertimbang"];
+         if($total == 0){
+            $total = $perkalian;
+         }else{
+             $total = $total * $perkalian;
+         }
+        }
+        $matrixPerbatasan = $total * $M;
+        $sqlMatrixPerbatasan .=
+                        "(NULL,'" .
+                        $idKriteria .
+                        "','" .
+                        $matrixPerbatasan .
+                        "'),";
+    }
+    // $sqlMatrixPerbatasan = rtrim($sqlMatrixPerbatasan, ', ');
+    // mysqli_query($conn, $sqlMatrixPerbatasan);
+
+    // perhitungan alternatif perbatasan
+    $dataPeserta = query("SELECT * FROM matrix_tertimbang");
+    $sqlPerkiraanPerbatasan = 'INSERT INTO perkiraan_perbatasan (id_perkalian_perbatasan,nik,id_kriteria, nilai_perkalian_perbatasan) VALUES';
+    foreach($dataPeserta as $dataPeserta){
+        $idKriteria = $dataPeserta["id_kriteria"];
+        $nikPeserta = $dataPeserta["nik"];
+        $nilaiMatrix = $dataPeserta["nilai_matrix_tertimbang"];
+        $dataPerbatasan = query("SELECT nilai_matrix_perbatasan FROM matrix_perbatasan WHERE id_kriteria = $idKriteria");
+        $nilaiPerbatasan = $dataPerbatasan[0]["nilai_matrix_perbatasan"];
+        $hasil = $nilaiMatrix - $nilaiPerbatasan;
+        $sqlPerkiraanPerbatasan .=
+                        "(NULL,'" .
+                        $nikPeserta .
+                        "','" .
+                        $idKriteria .
+                        "','" .
+                        $hasil .
+                        "'),";
+        
+    }
+    // $sqlPerkiraanPerbatasan = rtrim($sqlPerkiraanPerbatasan, ', ');
+    // mysqli_query($conn, $sqlPerkiraanPerbatasan);
+
+    // perangkingan
+    $dataPeserta = query("SELECT * FROM peserta");
+    $sqlPerangkingan = 'INSERT INTO perangkingan_alternatif (id_perangkingan_alternatif,nik,nilai_perankingan_alternatif) VALUES';
+    foreach($dataPeserta as $dataPeserta){
+        $nikPeserta = $dataPeserta["nik"];
+        $total = 0;
+        $dataPerkiraanPerbatasan = query("SELECT * FROM perkiraan_perbatasan WHERE nik = $nikPeserta");
+        foreach($dataPerkiraanPerbatasan as $data){
+            $dataMatrixPerbatasan = $data["nilai_perkalian_perbatasan"];
+            if($total == 0){
+                $total = $dataMatrixPerbatasan;
+            }else{
+                $total = $total * $dataMatrixPerbatasan;
+            }
+        }
+        $sqlPerangkingan .=
+                        "(NULL,'" .
+                        $nikPeserta .
+                        "','" .
+                        $total .
+                        "'),";
+    }
+    // $sqlPerangkingan = rtrim($sqlPerangkingan, ', ');
+    // mysqli_query($conn, $sqlPerangkingan);
 }
 
 ?>

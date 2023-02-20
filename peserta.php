@@ -13,6 +13,9 @@ if(isset($_POST["submit_logout"])){
 if(isset($_POST["submit_peserta"])){
   buatPeserta($_POST);
 }
+if(isset($_POST["edit_peserta"])){
+  var_dump($_POST);
+}
 
 ?>
 <!DOCTYPE html>
@@ -62,8 +65,8 @@ if(isset($_POST["submit_peserta"])){
                                 Data Perhitungan
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="#">Enthropy</a>
-                                <a class="dropdown-item" href="#">Mabac</a>
+                                <a class="dropdown-item" href="entropy.php">Enthropy</a>
+                                <a class="dropdown-item" href="mabac.php">Mabac</a>
                             </div>
                         </li>
                     </ul>
@@ -134,16 +137,17 @@ if(isset($_POST["submit_peserta"])){
                         <div class="biodata" id="biodata">
                             <div class="form-group">
                                 <label for="nik">Nik</label>
-                                <input type="text" class="form-control" name="nik" id="nik"
+                                <input type="text" required class="form-control" name="nik" id="nik"
                                     aria-describedby="emailHelp" />
                             </div>
                             <div class="form-group">
                                 <label for="nama">Nama</label>
-                                <input type="text" name="nama" class="form-control" id="nama" />
+                                <input type="text" required name="nama" class="form-control" id="nama" />
                             </div>
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Jenis Kelamin</label>
-                                <select class="form-control" id="exampleFormControlSelect1" name="jenis_kelamin">
+                                <select class="form-control" id="exampleFormControlSelect1" name="jenis_kelamin"
+                                    required>
                                     <option value="0">-- Silahkan Pilih Jenis Kelamin --</option>
                                     <option value="LAKI-LAKI">LAKI-LAKI</option>
                                     <option value="PEREMPUAN">PEREMPUAN</option>
@@ -151,19 +155,20 @@ if(isset($_POST["submit_peserta"])){
                             </div>
                             <div class="form-group">
                                 <label class="control-label" for="date">Date</label>
-                                <input class="form-control" id="date" name="date" placeholder="MM/DD/YYY" type="date" />
+                                <input class="form-control" required id="date" name="date" placeholder="MM/DD/YYY"
+                                    type="date" />
                             </div>
                             <div class="form-group">
                                 <label for="alamat">Alamat</label>
-                                <input type="text" class="form-control" name="alamat" id="alamat" />
+                                <input type="text" required class="form-control" name="alamat" id="alamat" />
                             </div>
                             <div class="form-group">
                                 <label for="rt">Rt</label>
-                                <input type="text" class="form-control" name="rt" id="rt" />
+                                <input type="text" required class="form-control" name="rt" id="rt" />
                             </div>
                             <div class="form-group">
                                 <label for="rw">Rw</label>
-                                <input type="text" class="form-control" name="rw" id="rw" />
+                                <input type="text" required class="form-control" name="rw" id="rw" />
                             </div>
                         </div>
                         <div class="pertanyaan d-none" id="pertanyaan">
@@ -174,7 +179,7 @@ if(isset($_POST["submit_peserta"])){
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1"><?= $dataKriteria["nama_kriteria"] ?></label>
                                 <input type="hidden" name="keterangan[]" value="<?= $dataKriteria["id_kriteria"] ?>">
-                                <select class="form-control" id="exampleFormControlSelect1"
+                                <select class="form-control" required id="exampleFormControlSelect1"
                                     name="<?= $dataKriteria["id_kriteria"] ?>">
                                     <option value="0">- Silahkan Pilih Sesuai Kriteria -</option>
                                     <?php
@@ -223,6 +228,8 @@ if(isset($_POST["submit_peserta"])){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
         integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
     $(document).ready(function() {
         var table = $("#example").DataTable({
@@ -281,8 +288,7 @@ if(isset($_POST["submit_peserta"])){
             }).then(response => {
                 return response.json()
             }).then(responseJson => {
-                let data = responseJson;
-
+                let data = responseJson
                 let modal = `
                 <div class="modal fade" id="modalEditPeserta" tabindex="-1" aria-labelledby="modalEditPesertaLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-scrollable modal-lg">
@@ -341,7 +347,7 @@ if(isset($_POST["submit_peserta"])){
                                         </button>
                                         <button type="button" class="btn btn-primary d-none" id="sebelumnyaEdit">Sebelumnya</button>
                                         <button type="button" class="btn btn-primary" id="selanjutnyaEdit">Selanjutnya</button>
-                                        <button type="submit" class="btn btn-primary d-none" name="submit_peserta"
+                                        <button type="submit" class="btn btn-primary d-none" name="edit_peserta"
                                             id="simpanEdit">Simpan</button>
                                     </div>
                                 </div>
@@ -350,9 +356,33 @@ if(isset($_POST["submit_peserta"])){
                         </div>
                     </div>
                 </div>`
+                let dataForm = new FormData();
+                let pertanyaan = data.map(data => ` 
+                     <div class="form-group">
+                        <label for="exampleFormControlSelect1">${data.nama_kriteria}</label>
+                        <input type="hidden" name="keterangan[]" value="${data.id_kriteria}"/>
+                        <select class="form-control optionDataPeserta" id="exampleFormControlSelect1"
+                            name="${data.id_kriteria}">
+                            <option value="${data.jawaban_peserta}" selected="selected">${data.keterangan}</option>` +
+                    $.ajax({
+                        type: "POST", //type of method
+                        url: "datadetailkriteria.php", //your page
+                        data: {
+                            id: data.id_kriteria
+                        }, // passing the values
+                        success: function(responseJson) {
+                            let dataOption = JSON.parse(responseJson)
+                            dataOption.map(data => '<option></option>')
+                        }
+                    }) +
+                    `
+                        </select>
+                    </div>
+                    `)
                 $("#editModalPeserta").html(modal);
                 $("#modalEditPeserta").modal("show");
                 $("#selanjutnyaEdit").on("click", function() {
+                    $("#pertanyaanEdit").html(pertanyaan);
                     $("#sebelumnyaEdit").removeClass("d-none");
                     $("#selanjutnyaEdit").addClass("d-none");
                     $("#biodataEdit").addClass("d-none");
@@ -367,6 +397,51 @@ if(isset($_POST["submit_peserta"])){
                     $("#simpanEdit").addClass("d-none");
                 })
             })
+        })
+        $('.btn-delete-peserta').on("click", function() {
+            let id = $(this).attr('data-id');
+            Swal.fire({
+                icon: "warning",
+                position: "top",
+                title: "Apakah anda yakin ?",
+                text: "Data Peserta Akan Terhapus",
+                showConfirmButton: true,
+                showCancelButton: true,
+                reverseButtons: true
+            }).then((result => {
+                if (result.isConfirmed) {
+                    let formData = new FormData;
+                    formData.append('id', id);
+                    fetch("hapusPeserta.php", {
+                        method: "POST",
+                        body: formData
+                    }).then(response => {
+                        return response.json()
+                    }).then(responseJson => {
+                        Swal.fire({
+                            title: 'Terhapus!',
+                            text: 'Peserta Berhasil Dihapus',
+                            icon: 'success',
+                            position: "top",
+                            showConfirmButton: false
+                        })
+                        setTimeout(() => {
+                            window.location.reload(true);
+                        }, 1000);
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Peserta Gagal Dihapus',
+                        icon: 'error',
+                        position: "top",
+                        showConfirmButton: false
+                    })
+                    setTimeout(() => {
+                        window.location.reload(true);
+                    }, 1000);
+                }
+            }))
         })
     });
     </script>
