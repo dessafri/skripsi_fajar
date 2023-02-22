@@ -111,7 +111,7 @@ if(isset($_POST["edit_peserta"])){
                             <td><?= $dataPeserta["rt"]?> / <?=$dataPeserta["rw"]?></td>
                             <td>
                                 <button class="btn btn-primary btn-edit-peserta" data-id=<?=$dataPeserta["nik"]?>><i
-                                        class="fas fa-pencil"></i></button>
+                                        class="fas fa-eye"></i></button>
                                 <button class="btn btn-danger btn-delete-peserta" data-id=<?=$dataPeserta["nik"]?>><i
                                         class="fas fa-trash"></i></button>
                             </td>
@@ -304,16 +304,16 @@ if(isset($_POST["edit_peserta"])){
                                     <div class="biodata" id="biodataEdit">
                                         <div class="form-group">
                                             <label for="nik">Nik</label>
-                                            <input type="text" value="${data[0].nik}" class="form-control" name="nik" id="nik"
+                                            <input type="text" disabled value="${data[0].nik}" class="form-control" name="nik" id="nik"
                                                 aria-describedby="emailHelp" />
                                         </div>
                                         <div class="form-group">
                                             <label for="nama">Nama</label>
-                                            <input type="text" name="nama" value='${data[0].nama}' class="form-control" id="nama" />
+                                            <input type="text" disabled name="nama" value='${data[0].nama}' class="form-control" id="nama" />
                                         </div>
                                         <div class="form-group">
                                             <label for="exampleFormControlSelect1">Jenis Kelamin</label>
-                                            <select class="form-control" id="exampleFormControlSelect1" name="jenis_kelamin">
+                                            <select class="form-control" disabled id="exampleFormControlSelect1" name="jenis_kelamin">
                                                 <option value="${data[0].jenis_kelamin}" selected>${data[0].jenis_kelamin}</option>
                                                 <option value="LAKI-LAKI">LAKI-LAKI</option>
                                                 <option value="PEREMPUAN">PEREMPUAN</option>
@@ -321,19 +321,19 @@ if(isset($_POST["edit_peserta"])){
                                         </div>
                                         <div class="form-group">
                                             <label class="control-label" for="date">Date</label>
-                                            <input class="form-control" value='${data[0].tanggal_lahir}' id="date" name="date" placeholder="MM/DD/YYY" type="date" />
+                                            <input class="form-control" disabled value='${data[0].tanggal_lahir}' id="date" name="date" placeholder="MM/DD/YYY" type="date" />
                                         </div>
                                         <div class="form-group">
                                             <label for="alamat">Alamat</label>
-                                            <input type="text" value='${data[0].alamat}' class="form-control" name="alamat" id="alamat" />
+                                            <input type="text" disabled value='${data[0].alamat}' class="form-control" name="alamat" id="alamat" />
                                         </div>
                                         <div class="form-group">
                                             <label for="rt">Rt</label>
-                                            <input type="text" value="${data[0].rt}" class="form-control" name="rt" id="rt" />
+                                            <input type="text" disabled value="${data[0].rt}" class="form-control" name="rt" id="rt" />
                                         </div>
                                         <div class="form-group">
                                             <label for="rw">Rw</label>
-                                            <input type="text" value="${data[0].rw}" class="form-control" name="rw" id="rw" />
+                                            <input type="text" disabled value="${data[0].rw}" class="form-control" name="rw" id="rw" />
                                         </div>
                                     </div>
                                     <div class="pertanyaan d-none" id="pertanyaanEdit">
@@ -347,8 +347,6 @@ if(isset($_POST["edit_peserta"])){
                                         </button>
                                         <button type="button" class="btn btn-primary d-none" id="sebelumnyaEdit">Sebelumnya</button>
                                         <button type="button" class="btn btn-primary" id="selanjutnyaEdit">Selanjutnya</button>
-                                        <button type="submit" class="btn btn-primary d-none" name="edit_peserta"
-                                            id="simpanEdit">Simpan</button>
                                     </div>
                                 </div>
                                 </form>
@@ -356,29 +354,20 @@ if(isset($_POST["edit_peserta"])){
                         </div>
                     </div>
                 </div>`
-                let dataForm = new FormData();
-                let pertanyaan = data.map(data => ` 
+
+                let pertanyaan = data.map((data, index) => ` 
                      <div class="form-group">
                         <label for="exampleFormControlSelect1">${data.nama_kriteria}</label>
                         <input type="hidden" name="keterangan[]" value="${data.id_kriteria}"/>
-                        <select class="form-control optionDataPeserta" id="exampleFormControlSelect1"
+                        <select class="form-control optionDataPeserta" id="edit${index++}"
                             name="${data.id_kriteria}">
-                            <option value="${data.jawaban_peserta}" selected="selected">${data.keterangan}</option>` +
-                    $.ajax({
-                        type: "POST", //type of method
-                        url: "datadetailkriteria.php", //your page
-                        data: {
-                            id: data.id_kriteria
-                        }, // passing the values
-                        success: function(responseJson) {
-                            let dataOption = JSON.parse(responseJson)
-                            dataOption.map(data => '<option></option>')
-                        }
-                    }) +
-                    `
+                            <option value="${data.jawaban_peserta}" selected="selected">${data.pilihan_peserta}</option>
+                            <?php
+                            ?>
                         </select>
                     </div>
                     `)
+
                 $("#editModalPeserta").html(modal);
                 $("#modalEditPeserta").modal("show");
                 $("#selanjutnyaEdit").on("click", function() {

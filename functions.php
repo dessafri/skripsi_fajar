@@ -176,8 +176,8 @@ function buatHasil(){
                         $normalisasi .
                         "'),";
         }
-        // $sqlNormalisasiEntropy = rtrim($sqlNormalisasiEntropy, ', ');
-        // mysqli_query($conn, $sqlNormalisasiEntropy);
+        $sqlNormalisasiEntropy = rtrim($sqlNormalisasiEntropy, ', ');
+        mysqli_query($conn, $sqlNormalisasiEntropy);
     }
     // entropy tiap atribut
     $dataPesertaNormalisasi = query("SELECT * FROM peserta");
@@ -200,8 +200,8 @@ function buatHasil(){
                         "'),";
         }
     }
-    // $sqlEntropy = rtrim($sqlEntropy, ', ');
-    // mysqli_query($conn, $sqlEntropy);
+    $sqlEntropy = rtrim($sqlEntropy, ', ');
+    mysqli_query($conn, $sqlEntropy);
 
     // ej
     $dataKriteria = query("SELECT * FROM kriteria");
@@ -222,8 +222,8 @@ function buatHasil(){
                         $ej1 .
                         "'),";
     }
-    //  $sqlEj = rtrim($sqlEj, ', ');
-    // mysqli_query($conn, $sqlEj);
+     $sqlEj = rtrim($sqlEj, ', ');
+    mysqli_query($conn, $sqlEj);
 
     // bobot entropy
     $dataKriteria = query("SELECT * FROM ej");
@@ -241,8 +241,8 @@ function buatHasil(){
                         $bobot .
                         "'),";
     }
-    // $sqlBobot = rtrim($sqlBobot, ', ');
-    // mysqli_query($conn, $sqlBobot);
+    $sqlBobot = rtrim($sqlBobot, ', ');
+    mysqli_query($conn, $sqlBobot);
 
     // normalisasi mabac
     $dataPeserta = query("SELECT * FROM peserta");
@@ -268,8 +268,8 @@ function buatHasil(){
                         "'),";
         }
     }
-    // $sqlNormalisasiMabac = rtrim($sqlNormalisasiMabac, ', ');
-    // mysqli_query($conn, $sqlNormalisasiMabac);
+    $sqlNormalisasiMabac = rtrim($sqlNormalisasiMabac, ', ');
+    mysqli_query($conn, $sqlNormalisasiMabac);
 
     // Matrix tertimbang
     $dataPeserta = query("SELECT * FROM peserta");
@@ -293,8 +293,8 @@ function buatHasil(){
                         "'),";
         }
     }
-    // $sqlMatrixtertimbang = rtrim($sqlMatrixtertimbang, ', ');
-    // mysqli_query($conn, $sqlMatrixtertimbang);
+    $sqlMatrixtertimbang = rtrim($sqlMatrixtertimbang, ', ');
+    mysqli_query($conn, $sqlMatrixtertimbang);
 
     // matrix area perbatasan
     $totalKriteria = query("SELECT COUNT(DISTINCT id_kriteria) AS TOTAL FROM matrix_tertimbang");
@@ -322,8 +322,8 @@ function buatHasil(){
                         $matrixPerbatasan .
                         "'),";
     }
-    // $sqlMatrixPerbatasan = rtrim($sqlMatrixPerbatasan, ', ');
-    // mysqli_query($conn, $sqlMatrixPerbatasan);
+    $sqlMatrixPerbatasan = rtrim($sqlMatrixPerbatasan, ', ');
+    mysqli_query($conn, $sqlMatrixPerbatasan);
 
     // perhitungan alternatif perbatasan
     $dataPeserta = query("SELECT * FROM matrix_tertimbang");
@@ -345,8 +345,8 @@ function buatHasil(){
                         "'),";
         
     }
-    // $sqlPerkiraanPerbatasan = rtrim($sqlPerkiraanPerbatasan, ', ');
-    // mysqli_query($conn, $sqlPerkiraanPerbatasan);
+    $sqlPerkiraanPerbatasan = rtrim($sqlPerkiraanPerbatasan, ', ');
+    mysqli_query($conn, $sqlPerkiraanPerbatasan);
 
     // perangkingan
     $dataPeserta = query("SELECT * FROM peserta");
@@ -370,8 +370,8 @@ function buatHasil(){
                         $total .
                         "'),";
     }
-    // $sqlPerangkingan = rtrim($sqlPerangkingan, ', ');
-    // mysqli_query($conn, $sqlPerangkingan);
+    $sqlPerangkingan = rtrim($sqlPerangkingan, ', ');
+    mysqli_query($conn, $sqlPerangkingan);
 }
 
 ?>

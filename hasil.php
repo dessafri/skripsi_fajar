@@ -10,11 +10,8 @@ if ($_SESSION['id'] != '1') {
 if(isset($_POST["submit_logout"])){
   logout($_POST);
 }
-if(isset($_POST["submit_kriteria"])){
-  buatKriteria($_POST);
-}
-if(isset($_POST["submit_edit_kriteria"])){
-    header("Refresh:0");
+if(isset($_POST["hitung_hasil"])){
+    // buatHasil($_POST);
 }
 ?>
 <!DOCTYPE html>
@@ -43,7 +40,7 @@ if(isset($_POST["submit_edit_kriteria"])){
         font-size: 18px;
     }
     </style>
-    <title>Daftar Kriteria</title>
+    <title>Hasil</title>
 </head>
 
 <body>
@@ -68,9 +65,9 @@ if(isset($_POST["submit_edit_kriteria"])){
                             <a class="nav-link font-navbar" href="kriteria.php">Data Kriteria</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-navbar" href="hasil.php">Hasil</a>
+                            <a class="nav-link font-navbar active" href="hasil.php">Hasil</a>
                         </li>
-                        <li class="nav-item dropdown active">
+                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle font-navbar" href="#" id="navbarDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Data Perhitungan
@@ -94,11 +91,57 @@ if(isset($_POST["submit_edit_kriteria"])){
                 <h1 class="h1-brand" style="font-size:22px;">HASIL PENERIMAAN BANTUAN</h1>
             </div>
             <div class="normalisasi-data" id="normalisasi" style="margin-bottom:50px;">
+                <table id="example" class="table table-striped table-bordered" style="width: 100%">
+                    <thead class="table-data">
+                        <tr>
+                            <th>No</th>
+                            <th>PESERTA</th>
+                            <th>NIK</th>
+                            <th>HASIL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $jumlah = query("SELECT * FROM perangkingan_alternatif");
+                        if(count($jumlah) > 0){
+                        $dataPeserta = query("SELECT * FROM peserta");
+                            $index = 1;
+                            foreach($dataPeserta as $dataPeserta):
+                                $nikPeserta = $dataPeserta["nik"];
+                            ?>
+                        <tr>
+                            <td><?= $index++?></td>
+                            <td><?= $dataPeserta["nama"]?></td>
+                            <td><?= $dataPeserta["nik"]?></td>
+                            <?php
+                                $dataKriteriaPeserta = query("SELECT * FROM perangkingan_alternatif WHERE nik = $nikPeserta ");
+                                foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
+                                ?>
+                            <td><?= $dataKriteriaPeserta["nilai_perankingan_alternatif"] ?></td>
+                            <?php endforeach; ?>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php }?>
 
+                    </tbody>
+                </table>
             </div>
             <div class="row">
                 <div class="col text-center">
-                    <button class="btn btn-primary" id="hitung">Hitung Hasil</button>
+                    <?php
+                    $jumlah = query("SELECT * FROM perangkingan_alternatif");
+                    if(count($jumlah) > 1){
+                        echo '
+                    <button class="btn btn-secondary" disabled id="hitung">Hitung Hasil</button>
+                        ';
+                    }else{
+                        echo '
+                        <form method="POST">
+                            <button name="hitung_hasil" class="btn btn-primary" id="hitung">Hitung Hasil</button>
+                        </form>
+                        ';
+                    }
+                    ?>
                 </div>
             </div>
         </div>
@@ -155,50 +198,6 @@ if(isset($_POST["submit_edit_kriteria"])){
             .buttons()
             .container()
             .appendTo("#example_wrapper .col-md-6:eq(0)");
-
-        $("#hitung").on("click", function() {
-            let spinner = `<div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-            </div>`;
-            $("#normalisasi").html(spinner);
-            let tabel = `
-            <table id="example" class="table table-striped table-bordered" style="width: 100%">
-            <thead class="table-data">
-                <tr>
-                    <th>No</th>
-                    <th>PESERTA</th>
-                    <th>NIK</th>
-                    <th>HASIL</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                        $dataPeserta = query("SELECT * FROM peserta");
-                        $index = 1;
-                        foreach($dataPeserta as $dataPeserta):
-                            $nikPeserta = $dataPeserta["nik"];
-                        ?>
-                <tr>
-                    <td><?= $index++?></td>
-                    <td><?= $dataPeserta["nama"]?></td>
-                    <td><?= $dataPeserta["nik"]?></td>
-                    <?php
-                            $dataKriteriaPeserta = query("SELECT * FROM perangkingan_alternatif WHERE nik = $nikPeserta ");
-                            foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
-                            ?>
-                    <td><?= $dataKriteriaPeserta["nilai_perankingan_alternatif"] ?></td>
-                    <?php endforeach; ?>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-            `
-            setTimeout(() => {
-                $("#normalisasi").html(tabel)
-            }, 3000);
-        })
     });
     </script>
 </body>
