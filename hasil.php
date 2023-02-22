@@ -11,7 +11,7 @@ if(isset($_POST["submit_logout"])){
   logout($_POST);
 }
 if(isset($_POST["hitung_hasil"])){
-    // buatHasil($_POST);
+    buatHasil($_POST);
 }
 ?>
 <!DOCTYPE html>
@@ -102,23 +102,16 @@ if(isset($_POST["hitung_hasil"])){
                     </thead>
                     <tbody>
                         <?php
-                        $jumlah = query("SELECT * FROM perangkingan_alternatif");
+                        $jumlah = query("SELECT peserta.nama, peserta.nik, perangkingan_alternatif.nilai_perankingan_alternatif FROM perangkingan_alternatif LEFT JOIN peserta ON peserta.nik = perangkingan_alternatif.nik ORDER BY perangkingan_alternatif.nilai_perankingan_alternatif DESC");
                         if(count($jumlah) > 0){
-                        $dataPeserta = query("SELECT * FROM peserta");
                             $index = 1;
-                            foreach($dataPeserta as $dataPeserta):
-                                $nikPeserta = $dataPeserta["nik"];
+                            foreach($jumlah as $dataPeserta):
                             ?>
                         <tr>
                             <td><?= $index++?></td>
                             <td><?= $dataPeserta["nama"]?></td>
                             <td><?= $dataPeserta["nik"]?></td>
-                            <?php
-                                $dataKriteriaPeserta = query("SELECT * FROM perangkingan_alternatif WHERE nik = $nikPeserta ");
-                                foreach($dataKriteriaPeserta as $dataKriteriaPeserta):
-                                ?>
-                            <td><?= $dataKriteriaPeserta["nilai_perankingan_alternatif"] ?></td>
-                            <?php endforeach; ?>
+                            <td><?= $dataPeserta["nilai_perankingan_alternatif"]?></td>
                         </tr>
                         <?php endforeach; ?>
                         <?php }?>
