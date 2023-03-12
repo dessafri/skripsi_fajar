@@ -68,6 +68,9 @@ if(isset($_POST["submit_edit_kriteria"])){
                             <a class="nav-link font-navbar" href="kriteria.php">Data Kriteria</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link font-navbar" href="penerima.php">Data Penerima</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link font-navbar" href="hasil.php">Hasil</a>
                         </li>
                         <li class="nav-item dropdown active">

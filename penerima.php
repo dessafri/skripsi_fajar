@@ -10,9 +10,6 @@ if ($_SESSION['id'] != '1') {
 if(isset($_POST["submit_logout"])){
   logout($_POST);
 }
-if(isset($_POST["hitung_hasil"])){
-    buatHasil($_POST);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,10 +62,10 @@ if(isset($_POST["hitung_hasil"])){
                             <a class="nav-link font-navbar" href="kriteria.php">Data Kriteria</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-navbar" href="penerima.php">Data Penerima</a>
+                            <a class="nav-link font-navbar active" href="penerima.php">Data Penerima</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-navbar active" href="hasil.php">Hasil</a>
+                            <a class="nav-link font-navbar" href="hasil.php">Hasil</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle font-navbar" href="#" id="navbarDropdown" role="button"
@@ -89,55 +86,25 @@ if(isset($_POST["hitung_hasil"])){
         </div>
     </section>
     <section class="content">
-        <div class="container">
-            <div style="display: flex; justify-content: space-between">
-                <h1 class="h1-brand" style="font-size:22px;">HASIL PENERIMAAN BANTUAN</h1>
-            </div>
-            <div class="normalisasi-data" id="normalisasi" style="margin-bottom:50px;">
-                <table id="example" class="table table-striped table-bordered" style="width: 100%">
-                    <thead class="table-data">
-                        <tr>
-                            <th>No</th>
-                            <th>PESERTA</th>
-                            <th>NIK</th>
-                            <th>HASIL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $jumlah = query("SELECT peserta.nama, peserta.nik, perangkingan_alternatif.nilai_perankingan_alternatif FROM perangkingan_alternatif LEFT JOIN peserta ON peserta.nik = perangkingan_alternatif.nik ORDER BY perangkingan_alternatif.nilai_perankingan_alternatif DESC");
-                        if(count($jumlah) > 0){
-                            $index = 1;
-                            foreach($jumlah as $dataPeserta):
-                            ?>
-                        <tr>
-                            <td><?= $index++?></td>
-                            <td><?= $dataPeserta["nama"]?></td>
-                            <td><?= $dataPeserta["nik"]?></td>
-                            <td><?= $dataPeserta["nilai_perankingan_alternatif"]?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <?php }?>
-
-                    </tbody>
-                </table>
-            </div>
-            <div class="row">
-                <div class="col text-center">
-                    <?php
-                    $jumlah = query("SELECT * FROM perangkingan_alternatif");
-                    if(count($jumlah) > 1){
-                        echo '
-                    <button class="btn btn-secondary" disabled id="hitung">Hitung Hasil</button>
-                        ';
-                    }else{
-                        echo '
-                        <form method="POST">
-                            <button name="hitung_hasil" class="btn btn-primary" id="hitung">Hitung Hasil</button>
-                        </form>
-                        ';
-                    }
-                    ?>
+        <div class="container" id="content">
+            <div class="form d-flex justify-content-center" style="width:100%;">
+                <div class="d-flex flex-wrap" style="width:70%;">
+                    <span class="inline-block text-center" style="width:100%;">Masukkan Jumlah Kuota Penerima
+                        Bantuan</span><br>
+                    <div class="row d-flex justify-content-center mt-3" style="width: 100%;">
+                        <div class="col text-center col-10">
+                            <div class="form-group">
+                                <input type="text" id="jmlData" name="inputJml" class="form-control"
+                                    aria-describedby="emailHelp">
+                            </div>
+                        </div>
+                        <div class="col text-center col-2">
+                            <div class="form-group">
+                                <button class="btn btn-primary" style="margin-left: -50px;"
+                                    id="penerima">Submit</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -164,36 +131,73 @@ if(isset($_POST["hitung_hasil"])){
 
     <script>
     $(document).ready(function() {
-        var table = $("#example").DataTable({
-            lengthChange: true,
-            buttons: [{
-                    extend: "excel",
-                    text: "Export Excel",
-                    className: "btn-success",
-                },
-                {
-                    extend: "spacer",
-                    style: "bar",
-                },
-                {
-                    extend: "pdf",
-                    text: "Export PDF",
-                    className: "btn-danger"
-                },
-                {
-                    extend: "spacer",
-                    style: "bar",
-                },
-                {
-                    extend: "colvis",
-                    text: "SORTIR"
-                },
-            ],
-        });
-        table
-            .buttons()
-            .container()
-            .appendTo("#example_wrapper .col-md-6:eq(0)");
+        $("#penerima").on("click", function() {
+            let jmlData = $("#jmlData").val() - 1;
+            fetch("dataHasil.php", {
+                method: "POST"
+            }).then(response => {
+                return response.json()
+            }).then(responseJson => {
+                console.log(responseJson)
+                let bantuanHtml = `<div style="display: flex; justify-content: space-between">
+                    <h1 class="h1-brand" style="font-size:22px;">DATA PENERIMAAN BANTUAN</h1>
+                </div>
+                <div class="normalisasi-data" id="normalisasi" style="margin-bottom:50px;">
+                <table id="example" class="table table-striped table-bordered" style="width: 100%">
+                    <thead class="table-data">
+                        <tr>
+                            <th>No</th>
+                            <th>PESERTA</th>
+                            <th>NIK</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    ${responseJson.map((data,index)=>
+                        `<tr>
+                            <td>${index+1}</td>
+                            <td>${data.nama}</td>
+                            <td>${data.nik}</td>
+                            <td>${index <= jmlData ? '<span class="d-inline-block text-success font-weight-bold">LOLOS</span>' : '<span class="d-inline-block text-danger font-weight-bold">TIDAK LOLOS</span>'}</td>
+                        </tr>`
+                    ).join('')}
+                    </tbody>
+                </table>
+                </div>`
+                $("#content").html(bantuanHtml);
+                $('#text').css("display", "none");
+                var table = $("#example").DataTable({
+                    lengthChange: true,
+                    buttons: [{
+                            extend: "excel",
+                            text: "Export Excel",
+                            className: "btn-success",
+                        },
+                        {
+                            extend: "spacer",
+                            style: "bar",
+                        },
+                        {
+                            extend: "pdf",
+                            text: "Export PDF",
+                            className: "btn-danger"
+                        },
+                        {
+                            extend: "spacer",
+                            style: "bar",
+                        },
+                        {
+                            extend: "colvis",
+                            text: "SORTIR"
+                        },
+                    ],
+                });
+                table
+                    .buttons()
+                    .container()
+                    .appendTo("#example_wrapper .col-md-6:eq(0)");
+            })
+        })
     });
     </script>
 </body>
